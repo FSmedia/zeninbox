@@ -12,23 +12,21 @@ if cwd not in sys.path:
     sys.path.insert(0, cwd)
 
 from app.main import app
-from starlette.types import ASGIApp, Scope, Receive, Send
+from fastapi import Request
 
-class VercelPathFixMiddleware:
-    def __init__(self, asgi_app: ASGIApp):
-        self.asgi_app = asgi_app
+@app.get("/api/test-route")
+def test_route(request: Request):
+    return {
+        "status": "ok",
+        "url_path": request.url.path,
+        "scope_path": request.scope.get("path"),
+        "headers": dict(request.headers),
+    }
 
-    async def __call__(self, scope: Scope, receive: Receive, send: Send):
-        if scope["type"] in ("http", "websocket"):
-            headers = dict(scope.get("headers", []))
-            # Vercel sends the original requested path in x-matched-path
-            matched_path = headers.get(b"x-matched-path")
-            if matched_path:
-                decoded = matched_path.decode("utf-8")
-                clean_path = decoded.split("?")[0]
-                scope["path"] = clean_path
-                scope["raw_path"] = clean_path.encode("utf-8")
-        await self.asgi_app(scope, receive, send)
-
-# Register middleware on app
-app.add_middleware(VercelPathFixMiddleware)
+@app.get("/api/index.py")
+def handle_direct_index(request: Request):
+    return {
+        "status": "ok",
+        "msg": "Reached /api/index.py directly",
+        "headers": dict(request.headers),
+    }
