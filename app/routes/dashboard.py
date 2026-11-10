@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from app.cleanfox import CleanfoxEngine
 from app.database import db_session
 
-router = APIRouter(prefix="/api", tags=["dashboard"])
+router = APIRouter(prefix="", tags=["dashboard"])
 
 @router.get("/stats")
 def get_stats():

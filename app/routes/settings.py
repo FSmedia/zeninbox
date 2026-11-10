@@ -9,7 +9,7 @@ from app.gmail_client import GmailClient
 from app.scheduler import ScanManager
 from app.database import db_session, log_activity
 
-router = APIRouter(prefix="/api", tags=["settings"])
+router = APIRouter(prefix="", tags=["settings"])
 
 class SettingsUpdate(BaseModel):
     gmail_user: Optional[str] = None

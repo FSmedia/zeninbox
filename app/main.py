@@ -35,15 +35,26 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-app.include_router(dashboard_router)
-app.include_router(ai_router)
-app.include_router(gatekeeper_router)
-app.include_router(subscriptions_router)
-app.include_router(rollup_router)
-app.include_router(settings_router)
+all_routers = [
+    dashboard_router,
+    ai_router,
+    gatekeeper_router,
+    subscriptions_router,
+    rollup_router,
+    settings_router
+]
 
-app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
+# Mount all routers with /api prefix AND without prefix
+for r in all_routers:
+    app.include_router(r, prefix="/api")
+    app.include_router(r)
+
+if STATIC_DIR.exists():
+    app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
 @app.get("/")
 def serve_index():
-    return FileResponse(str(STATIC_DIR / "index.html"))
+    index_file = STATIC_DIR / "index.html"
+    if index_file.exists():
+        return FileResponse(str(index_file))
+    return {"status": "ok", "app": "ZenInbox API"}
