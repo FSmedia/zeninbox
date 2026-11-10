@@ -1,7 +1,14 @@
 import sys
 import os
+from pathlib import Path
 
-# Ensure the project root is on the path
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# Ensure project root directory is on sys.path so 'app' can be imported anywhere
+project_root = str(Path(__file__).resolve().parent.parent)
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+
+cwd = os.getcwd()
+if cwd not in sys.path:
+    sys.path.insert(0, cwd)
 
 from app.main import app
